@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, JWTManager 
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
@@ -16,9 +16,12 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 # health check endpoint
+
+
 @api.route('/hello', methods=['GET'])
 def hello():
     return jsonify({"message": "Hello from the API!"}), 200
+
 
 @api.route('/signup', methods=['POST'])
 def create_user():
@@ -26,27 +29,28 @@ def create_user():
 
     # valid input
     if not data or 'email' not in data or 'password' not in data:
-        return jsonify({"error": "Email and password are required"}), 400 
-    
+        return jsonify({"error": "Email and password are required"}), 400
+
     # check to see if user already exists
     if User.query.filter_by(email=data['email']).first():
         return jsonify({"error": "User already exists"}), 400
-    
+
     # create new user
-    hashed_password = generate_password_hash(data['password'])
+
     new_user = User(
         email=data['email'],
-        password=hashed_password,
         is_active=True
     )
+    new_user.set_password(data['password'])
 
     try:
         db.session.add(new_user)
         db.session.commit()
         return jsonify({"message": "User created successfully"}), 201
-    except Exception as e: 
+    except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
 
 @api.route('/login', methods=['POST'])
 def create_token():
@@ -54,10 +58,10 @@ def create_token():
 
     if not data or 'email' not in data or 'password' not in data:
         return jsonify({"error": "Email and password are required"}), 400
-    
+
     user = User.query.filter_by(email=data['email']).first()
 
-    if not user or not check_password_hash(user.password, data['password']):
+    if not user or not check_password_hash(user.password_hash, data['password']):
         return jsonify({"error": "invalid credentials"}), 401
 
     # create token
@@ -68,6 +72,7 @@ def create_token():
         "email": user.email
     }), 200
 
+
 @api.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
@@ -75,6 +80,8 @@ def logout():
     return jsonify({"message": "Logged out successfully"}), 200
 
 # private route to check token and see if authorized to view private page
+
+
 @api.route('/private', methods=['GET'])
 @jwt_required()
 def private():
@@ -83,7 +90,7 @@ def private():
 
     if not user:
         return jsonify({"error": "User not found"}), 404
-    
+
     return jsonify({
         "message": "The private page works!",
         "user": {
