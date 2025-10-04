@@ -42,7 +42,7 @@ export const Navbar = () => {
 				</Link>
 				<div className="ml-auto d-flex">
 					{loggedIn ? (
-						<button className="btn btn-danger" onClick={handleLogout}>
+						<button type="btn" className="btn btn-danger" onClick={handleLogout}>
 							Logout
 						</button>
 					) : (
@@ -50,11 +50,11 @@ export const Navbar = () => {
 					)}
 					{loggedIn ? (
 						<Link to="/demo">
-							<button type="button" className="btn btn-primary m-1">Cart</button>
+							<button type="btn" className="btn btn-primary m-1">Cart</button>
 						</Link>
 					) : (
 						<Link to="/signup">
-							<button className="btn btn-primary m-1">Sign Up</button>
+							<button type="btn" className="btn btn-primary m-1">Sign Up</button>
 						</Link>
 					)}
 					

@@ -61,7 +61,7 @@ export const Login = () => {
         <div>
 
             {/* <!-- Button trigger modal --> */}
-            <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button type="button" className="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Login
             </button>
 
