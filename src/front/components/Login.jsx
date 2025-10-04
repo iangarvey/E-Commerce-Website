@@ -12,13 +12,11 @@ export const Login = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-          if (token) {
-              navigate("/");
-              console.log("Token found, navigating to the home page");
-              return;
-          }
+        if (token) {
+            return;
+        }
     }, [navigate]);
-    
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -48,9 +46,12 @@ export const Login = () => {
         if (data.token) {
             localStorage.setItem("token", data.token);
             setLoggedIn(true);
-
             // Notify navbar and other components of auth change
             window.dispatchEvent(new Event('authChange'));
+            // Close the modal using Bootstrap's modal API
+            const modal = window.bootstrap?.Modal.getOrCreateInstance(document.getElementById('exampleModal'));
+            if (modal) modal.hide();
+            navigate("/");
 
         }
     }
@@ -119,4 +120,3 @@ export const Login = () => {
         </div>
     )
 }
-        
