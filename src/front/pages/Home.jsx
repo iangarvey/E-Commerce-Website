@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Carousel } from "../components/Carousel.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const [categoryProducts, setCategoryProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const getFirstProductPerCategory = (products) => {
     const categoryMap = new Map();
@@ -19,6 +21,7 @@ export const Home = () => {
           price: product.price,
         });
       }
+      console.log(product.category);
     });
 
     return Array.from(categoryMap.values());
@@ -39,12 +42,10 @@ export const Home = () => {
     fetchCategoryImages();
   }, []);
 
-//   // Function to handle category click
-//   const handleCategoryClick = (category) => {
-//     // Navigate to category page - implement this based on routing
-//     console.log(`Navigating to ${category} page`);
-//     // Example: navigate(`/category/${category}`);
-//   };
+  const handleCategoryClick = (category) => {
+    const formattedCategory = category.toLowerCase().replace(/[^a-z0-9]/g, '');
+    navigate(`/${formattedCategory}`);
+  };
 
   if (loading) {
     return (
@@ -76,7 +77,7 @@ export const Home = () => {
               <div
                 className="card h-100 shadow-sm"
                 style={{ cursor: "pointer" }}
-                // onClick={() => handleCategoryClick(product.category)}
+                onClick={() => handleCategoryClick(product.category)}
               >
                 <img
                   src={product.image}
@@ -100,7 +101,7 @@ export const Home = () => {
                       className="btn btn-primary w-100"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent card click
-                        // handleCategoryClick(product.category);
+                        handleCategoryClick(product.category);
                       }}
                     >
                       shop {product.category}
