@@ -1,40 +1,117 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import ProductCard from "../components/ProductCard.jsx";
+import { Carousel } from "../components/Carousel.jsx";
 
 export const Home = () => {
+  const [categoryProducts, setCategoryProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-	fetch('https://fakestoreapi.com/products')
-		.then(res => res.json())
-		.then(products => {
-			// Get unique categories
-			const categories = [...new Set(products.map(product => product.category))];
+  const getFirstProductPerCategory = (products) => {
+    const categoryMap = new Map();
 
-			console.log(categories);
-		})
-		.catch(error => console.error('Error:', error));
+    products.forEach((product) => {
+      if (!categoryMap.has(product.category)) {
+        categoryMap.set(product.category, {
+          image: product.image,
+          category: product.category,
+          title: product.title,
+          id: product.id,
+          price: product.price,
+        });
+      }
+    });
 
-	return (
-		<div>
-			<div className="banner border border-danger mt-4" style={{ height: "300px" }}>
-				<h2>Banner Image</h2>
-			</div>
-			<div className="container">
-				<div className="row row-cols-2 row-cols-lg-5 g-2 g-lg-3 d-flex justify-content-evenly mt-4">
-					<div className="col">
-						<ProductCard />
-					</div>
-					<div className="col">
-						<ProductCard />
-					</div>
-					<div className="col">
-						<ProductCard />
-					</div>
-					<div className="col">
-						<ProductCard />
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}; 
+    return Array.from(categoryMap.values());
+  };
+
+  const fetchCategoryImages = async () => {
+    setLoading(true);
+
+    const response = await fetch("https://fakestoreapi.com/products");
+    const data = await response.json();
+    const firstProductsByCategory = getFirstProductPerCategory(data);
+
+    setCategoryProducts(firstProductsByCategory);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCategoryImages();
+  }, []);
+
+//   // Function to handle category click
+//   const handleCategoryClick = (category) => {
+//     // Navigate to category page - implement this based on routing
+//     console.log(`Navigating to ${category} page`);
+//     // Example: navigate(`/category/${category}`);
+//   };
+
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "200px" }}
+      >
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div
+        className="banner d-flex border border-danger mt-4"
+        style={{ maxHeight: "600px", overflow: "hidden", width: "100%" }}
+      >
+        <Carousel />
+      </div>
+
+      <div className="container mt-5">
+        <h2 className="text-center mb-4">Shop by Category</h2>
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
+          {categoryProducts.map((product) => (
+            <div key={product.category} className="col">
+              <div
+                className="card h-100 shadow-sm"
+                style={{ cursor: "pointer" }}
+                // onClick={() => handleCategoryClick(product.category)}
+              >
+                <img
+                  src={product.image}
+                  className="card-img-top p-3"
+                  alt={`${product.category} category`}
+                  style={{
+                    height: "200px",
+                    objectFit: "contain",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                />
+                <div className="card-body d-flex flex-column">
+                  <h5 className="card-title text-capitalize">
+                    {product.category}
+                  </h5>
+                  <p className="card-text text-muted small">
+                    Featured: {product.title}
+                  </p>
+                  <div className="mt-auto">
+                    <button
+                      className="btn btn-primary w-100"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click
+                        // handleCategoryClick(product.category);
+                      }}
+                    >
+                      shop {product.category}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
