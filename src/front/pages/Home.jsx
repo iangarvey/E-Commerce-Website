@@ -42,7 +42,7 @@ export const Home = () => {
     fetchCategoryImages();
   }, []);
 
-  const handleCategoryClick = (category) => {
+  const handleShopCategoryClick = (category) => {
     const formattedCategory = category.toLowerCase().replace(/[^a-z0-9]/g, '');
     navigate(`/${formattedCategory}`);
   };
@@ -77,7 +77,7 @@ export const Home = () => {
               <div
                 className="card h-100 shadow-sm"
                 style={{ cursor: "pointer" }}
-                onClick={() => handleCategoryClick(product.category)}
+                onClick={() => handleShopCategoryClick(product.category)}
               >
                 <img
                   src={product.image}
@@ -101,7 +101,7 @@ export const Home = () => {
                       className="btn btn-primary w-100"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent card click
-                        handleCategoryClick(product.category);
+                        handleShopCategoryClick(product.category);
                       }}
                     >
                       shop {product.category}
