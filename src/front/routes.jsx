@@ -12,6 +12,7 @@ import { Demo } from "./pages/Demo";
 import { SignUp } from "./pages/SignUp";
 import { CategoryPage } from "./pages/CategoryPage";
 import { ProductPage } from "./pages/ProductPage";
+import { Cart } from "./pages/Cart";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -31,6 +32,7 @@ export const router = createBrowserRouter(
         <Route path ="/signup" element={<SignUp />} />
         <Route path="/:category" element={<CategoryPage />} />
         <Route path="/product/:productId/:productTitle" element={<ProductPage />} />
+        <Route path="/cart" element={<Cart />} />
       </Route>
     )
 );

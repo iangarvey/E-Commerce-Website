@@ -49,7 +49,7 @@ export const Navbar = () => {
 						<Login />
 					)}
 					{loggedIn ? (
-						<Link to="/demo">
+						<Link to="/cart">
 							<button type="btn" className="btn btn-primary m-1">Cart</button>
 						</Link>
 					) : (
