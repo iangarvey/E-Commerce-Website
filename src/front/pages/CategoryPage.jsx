@@ -53,7 +53,7 @@ export const CategoryPage = () => {
         className="banner d-flex border border-danger mt-4 mb-5"
         style={{ maxHeight: "600px", overflow: "hidden", width: "100%" }}
       >
-        <Carousel />
+        <Carousel specificCategory={category} />
       </div>
 
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
