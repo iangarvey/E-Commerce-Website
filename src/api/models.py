@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, DateTime, Numeric
+from sqlalchemy import String, Boolean, ForeignKey, DateTime, Numeric, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -70,7 +70,7 @@ class Cart(db.Model):
 class CartItem(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     cart_id: Mapped[int] = mapped_column(ForeignKey("cart.id"), index=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"), index=True)
+    product_id: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(default=1, nullable=False)
     added_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 

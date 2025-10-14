@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 export const ProductPage = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
   useEffect(() => {
     fetch(`https://fakestoreapi.com/products/${productId}`)
@@ -23,6 +24,27 @@ export const ProductPage = () => {
         </div>
       </div>
     );
+  }
+
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+    const response = await fetch(`${apiUrl}api/add-to-cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    if (!response.ok) {
+      alert("Failed to add item to cart. Please try again.");
+      return;
+    }
+    alert(`${product.title} has been added to your cart!`);
   }
 
   return (
@@ -46,7 +68,7 @@ export const ProductPage = () => {
         <div className="description border border-warning">
           {product.description}
         </div>
-        <div className="btn btn-primary d-flex align-self-center mt-5" style={{ width: "18%" }}>Add to Cart</div>
+        <button className="btn btn-primary d-flex align-self-center mt-5" style={{ width: "18%" }} onClick={handleAddToCart}>Add to Cart</button>
       </div>
     </div>
   );
