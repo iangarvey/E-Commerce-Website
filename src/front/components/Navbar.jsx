@@ -42,7 +42,7 @@ export const Navbar = () => {
 				</Link>
 				<div className="ml-auto d-flex">
 					{loggedIn ? (
-						<button type="btn" className="btn btn-danger" onClick={handleLogout}>
+						<button type="btn" className="btn btn-danger me-2" onClick={handleLogout}>
 							Logout
 						</button>
 					) : (
@@ -50,7 +50,7 @@ export const Navbar = () => {
 					)}
 					{loggedIn ? (
 						<Link to="/cart">
-							<button type="btn" className="btn btn-primary m-1">Cart</button>
+							<i className="fa-solid fa-cart-shopping border border-primary p-2" style={{ backgroundColor: "lightblue", borderRadius: "22%" }}></i>
 						</Link>
 					) : (
 						<Link to="/signup">

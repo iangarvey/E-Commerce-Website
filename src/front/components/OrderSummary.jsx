@@ -18,7 +18,12 @@ export const OrderSummary = () => {
         <div className="order-summary-container border border-primary">
             <h1>Order Summary</h1>
             <OrderSummaryCard />
-            <h2>Total: $00.00</h2>
+            <div div className="total-container d-flex justify-content-center">
+                <h2>Total: $00.00</h2>
+            </div>
+            <div className="checkout-button-container d-flex justify-content-center">
+                <button className="btn btn-success">Checkout</button>
+            </div>
         </div>
 
     )
