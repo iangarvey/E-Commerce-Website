@@ -1,4 +1,3 @@
-import { use } from "react";
 import { useEffect, useState } from "react";
 
 export const ProductCard = ({productId, quantity }) => {
