@@ -99,7 +99,7 @@ def private():
         }
     }), 200
 
-@api.route('/get-cart', methods=['GET'])
+@api.route('/cart', methods=['GET'])
 @jwt_required()
 def get_cart():
     current_user_id = get_jwt_identity()
@@ -108,11 +108,24 @@ def get_cart():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    cart_items = user.cart if hasattr(user, 'cart') else []
+    cart = Cart.query.filter_by(user_id=current_user_id).first()
+    if not cart:
+        return jsonify({"cart": []}), 200
+    
+    cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
+
+    items = [{
+        "id": item.id,
+        "product_id": item.product_id,
+        "quantity": item.quantity,
+        "added_at": item.added_at.isoformat()
+    } for item in cart_items]
 
     return jsonify({
-        "cart": cart_items
+        "cart": items
     }), 200
+
+
 
 @api.route('/add-to-cart', methods=['POST'])
 @jwt_required()
