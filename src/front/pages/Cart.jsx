@@ -42,6 +42,7 @@ export const Cart = () => {
                             key={item.id}
                             productId={item.product_id}
                             quantity={item.quantity}
+                            image={item.image}
                         />
                     ))}
                 </div>

@@ -1,7 +1,7 @@
 import { use } from "react";
 import { useEffect, useState } from "react";
 
-export const ProductCard = ({productId, quantity}) => {
+export const ProductCard = ({productId, quantity }) => {
     const [title, setTitle] = useState("Product Title");
     const [price, setPrice] = useState("00.00");
     const [image, setImage] = useState("https://via.placeholder.com/150");
@@ -25,7 +25,7 @@ export const ProductCard = ({productId, quantity}) => {
     return (
         <div className="product-card-container d-flex border border-primary">
             <div className="product-image border border-danger m-2" style={{ minHeight: "200px", minWidth: "200px" }}>
-                <h2>image</h2>
+                <img src={image} alt={title} style={{ height: "200px", width: "200px", objectFit: "contain" }} ></img>
             </div>
             <div className="details-container d-flex w-100" style={{ height: "30px"}}>
                 <div className="title-quantity-remove border m-2">
