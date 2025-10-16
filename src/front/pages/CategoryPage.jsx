@@ -6,6 +6,7 @@ export const CategoryPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { category } = useParams();
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +34,27 @@ export const CategoryPage = () => {
     const formattedProduct = productTitle.toLowerCase().replace(/[^a-z0-9]/g, "");
     navigate(`/product/${productId}/${formattedProduct}`);
   };
+
+  const handleAddToCart = async (productId, productTitle) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+    const response = await fetch(`${apiUrl}api/add-to-cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    if (!response.ok) {
+      alert("Failed to add item to cart. Please try again.");
+      return;
+    }
+    alert(`${productTitle} has been added to your cart!`);
+  }
 
   if (loading) {
     return (
@@ -80,12 +102,12 @@ export const CategoryPage = () => {
                 <div className="buttons d-flex mt-auto">
                   <button
                     className="btn btn-success w-100 me-2"
-                    //   onClick={(e) => {
-                    //     e.stopPropagation(); // Prevent card click
-                    //     handleCategoryClick(product.category);
-                    //   }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click
+                        handleAddToCart(product.id, product.title);
+                      }}
                   >
-                    Buy Now!
+                    Add to Cart
                   </button>
                   <button
                     className="btn btn-warning w-100"
