@@ -57,7 +57,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-light bg-light border border-primary">
+    <nav className="navbar navbar-light bg-light border border-primary fixed-top">
       <div className="container">
         <Link to="/">
           <span className="navbar-brand mb-0 h1">Home</span>
