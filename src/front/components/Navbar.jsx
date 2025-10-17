@@ -22,7 +22,6 @@ export const Navbar = () => {
     };
   }, []);
 
-  // Fetch cart count when logged in
   useEffect(() => {
     if (loggedIn) {
       fetchCartCount();
@@ -67,7 +66,6 @@ export const Navbar = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
 
-    // Notify other components of auth change
     window.dispatchEvent(new Event("authChange"));
 
     alert("You have been logged out successfully!");
