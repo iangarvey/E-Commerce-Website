@@ -169,3 +169,38 @@ def add_to_cart():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@api.route('/remove-from-cart', methods=['DELETE'])
+@jwt_required()
+def remove_from_cart():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+    if not data or 'productId' not in data:
+        return jsonify({"error": "Product ID is required"}), 400
+
+    # Get user's cart
+    cart = Cart.query.filter_by(user_id=current_user_id).first()
+    if not cart:
+        return jsonify({"error": "Cart not found"}), 404
+
+    # Find the cart item
+    cart_item = CartItem.query.filter_by(
+        cart_id=cart.id, 
+        product_id=data['productId']
+    ).first()
+
+    if not cart_item:
+        return jsonify({"error": "Item not found in cart"}), 404
+
+    try:
+        db.session.delete(cart_item)
+        db.session.commit()
+        return jsonify({"message": "Item removed from cart successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

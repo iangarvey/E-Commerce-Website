@@ -7,47 +7,13 @@ export const Navbar = () => {
   const [cartItemCount, setCartItemCount] = useState(0);
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const token = localStorage.getItem("token");
-      setLoggedIn(!!token);
-    };
-    checkAuthStatus();
-    window.addEventListener("storage", checkAuthStatus);
-    window.addEventListener("authChange", checkAuthStatus);
-
-    return () => {
-      window.removeEventListener("storage", checkAuthStatus);
-      window.removeEventListener("authChange", checkAuthStatus);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (loggedIn) {
-      fetchCartCount();
-    } else {
-      setCartItemCount(0);
-    }
-  }, [loggedIn]);
-
-  // Listen for cart updates
-  useEffect(() => {
-    const handleCartUpdate = () => {
-      fetchCartCount();
-    };
-
-    window.addEventListener("cartUpdate", handleCartUpdate);
-
-    return () => {
-      window.removeEventListener("cartUpdate", handleCartUpdate);
-    };
-  }, []);
-
   const fetchCartCount = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const response = await fetch(`${apiUrl}/api/cart`, {
+    console.log("Fetching cart count...");
+
+    const response = await fetch(`${apiUrl}api/cart`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -57,10 +23,45 @@ export const Navbar = () => {
 
     if (response.ok) {
       const data = await response.json();
+      console.log("Cart data:", data);
+      console.log("Cart count:", data.cart?.length || 0);
       setCartItemCount(data.cart?.length || 0);
-    } else { }
-  }
+    }
+  };
 
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem("token");
+      const isLoggedIn = !!token;
+      setLoggedIn(isLoggedIn);
+      
+      // Fetch cart count when logged in
+      if (isLoggedIn) {
+        fetchCartCount();
+      } else {
+        setCartItemCount(0);
+      }
+    };
+
+    const handleCartUpdate = () => {
+      console.log("cartUpdate event received!");
+      fetchCartCount();
+    };
+
+    // Initial check
+    checkAuthStatus();
+
+    // Set up listeners
+    window.addEventListener("storage", checkAuthStatus);
+    window.addEventListener("authChange", checkAuthStatus);
+    window.addEventListener("cartUpdate", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("storage", checkAuthStatus);
+      window.removeEventListener("authChange", checkAuthStatus);
+      window.removeEventListener("cartUpdate", handleCartUpdate);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -72,7 +73,6 @@ export const Navbar = () => {
 
     window.location.href = "/";
   };
-
 
   return (
     <nav className="navbar navbar-light bg-light border border-primary fixed-top">

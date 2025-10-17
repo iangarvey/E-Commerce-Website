@@ -53,6 +53,8 @@ export const CategoryPage = () => {
       alert("Failed to add item to cart. Please try again.");
       return;
     }
+    console.log("Dispatching cartUpdate event...");
+    window.dispatchEvent(new Event("cartUpdate"));
     alert(`${productTitle} has been added to your cart!`);
   }
 
@@ -84,7 +86,7 @@ export const CategoryPage = () => {
             <div
               className="card h-100 shadow-sm"
               style={{ cursor: "pointer" }}
-              // onClick={() => handleCategoryClick(product.category)}
+            // onClick={() => handleCategoryClick(product.category)}
             >
               <img
                 src={product.image}
@@ -102,10 +104,10 @@ export const CategoryPage = () => {
                 <div className="buttons d-flex mt-auto">
                   <button
                     className="btn btn-success w-100 me-2"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent card click
-                        handleAddToCart(product.id, product.title);
-                      }}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click
+                      handleAddToCart(product.id, product.title);
+                    }}
                   >
                     Add to Cart
                   </button>
