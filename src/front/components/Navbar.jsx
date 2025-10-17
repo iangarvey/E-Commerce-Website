@@ -4,6 +4,7 @@ import { Login } from "./Login";
 
 export const Navbar = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
   useEffect(() => {
@@ -21,6 +22,47 @@ export const Navbar = () => {
     };
   }, []);
 
+  // Fetch cart count when logged in
+  useEffect(() => {
+    if (loggedIn) {
+      fetchCartCount();
+    } else {
+      setCartItemCount(0);
+    }
+  }, [loggedIn]);
+
+  // Listen for cart updates
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener("cartUpdate", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("cartUpdate", handleCartUpdate);
+    };
+  }, []);
+
+  const fetchCartCount = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const response = await fetch(`${apiUrl}/api/cart`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setCartItemCount(data.cart?.length || 0);
+    } else { }
+  }
+
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
@@ -33,28 +75,6 @@ export const Navbar = () => {
     window.location.href = "/";
   };
 
-  const handleGetCart = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please log in to view your cart.");
-      return;
-    }
-
-    const response = await fetch(`${apiUrl}/cart`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Cart data:", data);
-    } else {
-      alert("Failed to fetch cart data. Please try again.");
-    }
-  };
 
   return (
     <nav className="navbar navbar-light bg-light border border-primary fixed-top">
@@ -78,14 +98,22 @@ export const Navbar = () => {
             <Link to="/cart">
               <button
                 type="btn"
-                className="fa-solid fa-cart-shopping border border-primary btn-primary m-1 p-2"
+                className="fa-solid fa-cart-shopping border border-primary btn-primary m-1 p-2 position-relative"
                 style={{
                   color: "blue",
                   backgroundColor: "lightblue",
                   borderRadius: "22%",
                 }}
-                onClick={handleGetCart}
-              ></button>
+              >
+                {cartItemCount > 0 && (
+                  <span
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
+                    style={{ fontSize: "0.75rem" }}
+                  >
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
             </Link>
           ) : (
             <Link to="/signup">
