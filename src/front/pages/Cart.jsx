@@ -1,4 +1,4 @@
-import { ProductCard } from "../components/ProductCard"
+import { ProductCard } from "../components/ProductCard";
 import { OrderSummary } from "../components/OrderSummary"
 import { useEffect, useState } from "react";
 
@@ -24,8 +24,32 @@ export const Cart = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setCartItems(data.cart); 
                 console.log("Cart items:", data.cart);
+                const cartItemsWithDetails = await Promise.all(
+                    data.cart.map(async (item) => {
+                        const productResponse = await fetch(`https://fakestoreapi.com/products/${item.product_id}`);
+
+                        if (productResponse.ok) {
+                            const productData = await productResponse.json();
+
+                            return {
+                                ...item,
+                                title: productData.title,
+                                price: productData.price,
+                                image: productData.image
+                            };
+                        } else {
+                            // Fallback if product fetch fails
+                            return {
+                                ...item,
+                                title: "Product",
+                                price: 0,
+                                image: "https://via.placeholder.com/150"
+                            };
+                        }
+                    })
+                );
+                setCartItems(cartItemsWithDetails);
             } else {
                 alert("Failed to fetch cart items. Please try again.");
             }
@@ -34,20 +58,18 @@ export const Cart = () => {
     }, []);
 
     return (
-        <div className="cart-page-container d-flex justify-content-center" style={{ marginTop: "100px"}}>
+        <div className="cart-page-container d-flex justify-content-center" style={{ marginTop: "100px" }}>
             <div className="cart-container border d-flex" style={{ minHeight: "400px", width: "80%" }}>
                 <div className="product-card-container" style={{ width: "65%" }}>
                     {cartItems.map((item) => (
                         <ProductCard
                             key={item.id}
-                            productId={item.product_id}
-                            quantity={item.quantity}
-                            image={item.image}
+                            item={item}
                         />
                     ))}
                 </div>
-                <div className="order-summary-container" style={{ width: "35%" }}>
-                    <OrderSummary />
+                <div className="total-container" style={{ width: "35%" }}>
+                    <OrderSummary cartItems={cartItems}/>
                 </div>
             </div>
         </div>

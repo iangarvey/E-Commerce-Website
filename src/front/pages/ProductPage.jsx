@@ -26,28 +26,6 @@ export const ProductPage = () => {
     );
   }
 
-  // const handleAddToCart = async () => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     alert("Please log in to add items to your cart.");
-  //     return;
-  //   }
-  //   const response = await fetch(`${apiUrl}api/add-to-cart`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //     body: JSON.stringify({ productId, quantity: 1 }),
-  //   });
-  //   if (!response.ok) {
-  //     alert("Failed to add item to cart. Please try again.");
-  //     return;
-  //   }
-  //   alert(`${product.title} has been added to your cart!`);
-  //   window.dispatchEvent(new Event("cartUpdate"));
-  // }
-
   const handleAddToCart = async () => {
   const token = localStorage.getItem("token");
   if (!token) {

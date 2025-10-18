@@ -1,25 +1,8 @@
 import { useEffect, useState } from "react";
 
-export const ProductCard = ({ productId, quantity }) => {
-    const [title, setTitle] = useState("Product Title");
-    const [price, setPrice] = useState("00.00");
-    const [image, setImage] = useState("https://via.placeholder.com/150");
+export const ProductCard = ({ item }) => {
+    const { product_id, quantity, title, price, image } = item;
     const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
-
-    useEffect(() => {
-        const fetchProductDetails = async () => {
-            const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setTitle(data.title);
-                setPrice(data.price);
-                setImage(data.image);
-            } else {
-                alert("Failed to fetch product details. Please try again.");
-            }
-        };
-        fetchProductDetails();
-    }, [productId]);
 
     const handleRemoveFromCart = async () => {
         const token = localStorage.getItem("token");
@@ -34,7 +17,7 @@ export const ProductCard = ({ productId, quantity }) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ productId }),
+            body: JSON.stringify({ productId: product_id }),
         });
 
         if (response.ok) {
@@ -60,7 +43,7 @@ export const ProductCard = ({ productId, quantity }) => {
                     <button className="btn btn-danger" onClick={handleRemoveFromCart}>Remove</button>
                 </div>
                 <div className="price ms-auto mt-2 me-2">
-                    <h4 className="border border-success">{price}</h4>
+                    <h4 className="border border-success">${price}</h4>
                 </div>
             </div>
         </div>
