@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Login } from "./Login";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0);
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const { dispatch, store } = useGlobalReducer();
+  const loggedIn = store.isLoggedIn;
 
   const fetchCartCount = async () => {
     const token = localStorage.getItem("token");
@@ -23,54 +24,22 @@ export const Navbar = () => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Cart data:", data);
-      console.log("Cart count:", data.cart?.length || 0);
-      setCartItemCount(data.cart?.length || 0);
+      const totalQuantity = data.cart?.reduce((total, item) => {
+        return total + item.quantity;
+      }, 0) || 0;
+      dispatch({ type: 'update_cart_count', payload: totalQuantity });
     }
   };
 
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const token = localStorage.getItem("token");
-      const isLoggedIn = !!token;
-      setLoggedIn(isLoggedIn);
-      
-      // Fetch cart count when logged in
-      if (isLoggedIn) {
-        fetchCartCount();
-      } else {
-        setCartItemCount(0);
-      }
-    };
-
-    const handleCartUpdate = () => {
-      console.log("cartUpdate event received!");
-      fetchCartCount();
-    };
-
-    // Initial check
-    checkAuthStatus();
-
-    // Set up listeners
-    window.addEventListener("storage", checkAuthStatus);
-    window.addEventListener("authChange", checkAuthStatus);
-    window.addEventListener("cartUpdate", handleCartUpdate);
-
-    return () => {
-      window.removeEventListener("storage", checkAuthStatus);
-      window.removeEventListener("authChange", checkAuthStatus);
-      window.removeEventListener("cartUpdate", handleCartUpdate);
-    };
-  }, []);
+    // when component mounts, if logged in fetch cart count
+    if (store.isLoggedIn) fetchCartCount();
+  }, [store.isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setLoggedIn(false);
-
-    window.dispatchEvent(new Event("authChange"));
-
+    dispatch({ type: 'logout' });
     alert("You have been logged out successfully!");
-
     window.location.href = "/";
   };
 
@@ -92,27 +61,51 @@ export const Navbar = () => {
           ) : (
             <Login />
           )}
+
           {loggedIn ? (
-            <Link to="/cart">
-              <button
-                type="btn"
-                className="fa-solid fa-cart-shopping border border-primary btn-primary m-1 p-2 position-relative"
-                style={{
-                  color: "blue",
-                  backgroundColor: "lightblue",
-                  borderRadius: "22%",
-                }}
-              >
-                {cartItemCount > 0 && (
-                  <span
-                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
-                    style={{ fontSize: "0.75rem" }}
-                  >
-                    {cartItemCount}
-                  </span>
-                )}
-              </button>
-            </Link>
+            <div className="position-relative">
+              <Link to="/cart">
+                <button
+                  type="btn"
+                  className="fa-solid fa-cart-shopping border border-primary btn-primary m-1 p-2 position-relative"
+                  style={{
+                    color: "blue",
+                    backgroundColor: "lightblue",
+                    borderRadius: "22%",
+                  }}
+                >
+                  {store.cartCount > 0 && (
+                    <span
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
+                      style={{ fontSize: "0.75rem" }}
+                    >
+                      {store.cartCount}
+                    </span>
+                  )}
+                </button>
+              </Link>
+
+              {store.showCartDropdown && (
+                <ul
+                  className="dropdown-menu dropdown-menu-dark show position-absolute"
+                  style={{
+                    top: '100%',
+                    right: '0',
+                    zIndex: 1050,
+                    marginTop: '5px'
+                  }}
+                >
+                  <li className="px-3 py-2">
+                    <h6 className="text-success mb-2">✓ Item Added!</h6>
+                    <Link to="/cart">
+                      <button className="btn btn-primary btn-sm w-100">
+                        View Cart ({store.cartCount})
+                      </button>
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </div>
           ) : (
             <Link to="/signup">
               <button type="btn" className="btn btn-primary m-1">
@@ -121,7 +114,7 @@ export const Navbar = () => {
             </Link>
           )}
         </div>
-      </div>
-    </nav>
+      </div >
+    </nav >
   );
 };

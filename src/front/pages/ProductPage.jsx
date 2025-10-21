@@ -27,27 +27,40 @@ export const ProductPage = () => {
   }
 
   const handleAddToCart = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Please log in to add items to your cart.");
-    return;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+    const response = await fetch(`${apiUrl}api/add-to-cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    if (!response.ok) {
+      alert("Failed to add item to cart. Please try again.");
+      return;
+    }
+    const cartResponse = await fetch(`${apiUrl}api/cart`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (cartResponse.ok) {
+      const cartData = await cartResponse.json()
+      const totalQuantity = cartData.cart?.reduce((total, item) => {
+        return total + item.quantity;
+      }, 0) || 0;
+
+      dispatch({ type: "update_cart_count", payload: totalQuantity })
+    }
+    dispatch({ type: "open_cart_dropdown" })
   }
-  const response = await fetch(`${apiUrl}api/add-to-cart`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ productId, quantity: 1 }),
-  });
-  if (!response.ok) {
-    alert("Failed to add item to cart. Please try again.");
-    return;
-  }
-  console.log("Dispatching cartUpdate event...");
-  window.dispatchEvent(new Event("cartUpdate"));
-  alert(`${product.title} has been added to your cart!`);
-}
 
   return (
     <div className="container d-flex mt-5 p-0 border border-danger">
