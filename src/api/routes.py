@@ -99,6 +99,7 @@ def private():
         }
     }), 200
 
+
 @api.route('/cart', methods=['GET'])
 @jwt_required()
 def get_cart():
@@ -111,7 +112,7 @@ def get_cart():
     cart = Cart.query.filter_by(user_id=current_user_id).first()
     if not cart:
         return jsonify({"cart": []}), 200
-    
+
     cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
 
     items = [{
@@ -124,7 +125,6 @@ def get_cart():
     return jsonify({
         "cart": items
     }), 200
-
 
 
 @api.route('/add-to-cart', methods=['POST'])
@@ -149,7 +149,7 @@ def add_to_cart():
 
     # Check if product already in cart
     existing_item = CartItem.query.filter_by(
-        cart_id=cart.id, 
+        cart_id=cart.id,
         product_id=data['productId']
     ).first()
 
@@ -170,9 +170,11 @@ def add_to_cart():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @api.route('/remove-from-cart', methods=['DELETE'])
 @jwt_required()
 def remove_from_cart():
+    print("=== REMOVE FROM CART CALLED ===")
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
@@ -180,20 +182,29 @@ def remove_from_cart():
         return jsonify({"error": "User not found"}), 404
 
     data = request.get_json()
+    print("Received data:", data)
+
     if not data or 'productId' not in data:
         return jsonify({"error": "Product ID is required"}), 400
 
-    # Get user's cart
     cart = Cart.query.filter_by(user_id=current_user_id).first()
     if not cart:
         return jsonify({"error": "Cart not found"}), 404
 
-    # Find the cart item
+    print("Cart ID:", cart.id)
+    print("Looking for product_id:", data['productId'])
+
+    all_items = CartItem.query.filter_by(cart_id=cart.id).all()
+    print("All items in cart:", [(item.id, item.product_id) for item in all_items])
+
     cart_item = CartItem.query.filter_by(
-        cart_id=cart.id, 
+        cart_id=cart.id,
         product_id=data['productId']
     ).first()
 
+    print("Found cart_item:", cart_item)
+
+    # ADD THE REST OF THE FUNCTION:
     if not cart_item:
         return jsonify({"error": "Item not found in cart"}), 404
 

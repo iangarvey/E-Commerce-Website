@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const ProductCard = ({ item }) => {
     const { product_id, quantity, title, price, image } = item;
+    const { dispatch } = useGlobalReducer()
     const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     const handleRemoveFromCart = async () => {
         const token = localStorage.getItem("token");
+        console.log("Trying to remove product_id:", product_id);
+        console.log("Full item:", item);
         if (!token) {
             alert("Please log in to remove items from your cart.");
             return;
