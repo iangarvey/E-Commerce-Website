@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const ProductPage = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
+  const { dispatch } = useGlobalReducer();
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+
 
   useEffect(() => {
     fetch(`https://fakestoreapi.com/products/${productId}`)

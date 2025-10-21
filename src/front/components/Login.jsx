@@ -12,13 +12,11 @@ export const Login = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // keep global store auth state in sync with other tabs and auth changes
         const checkAuth = () => {
-            const t = localStorage.getItem("token");
-            if (t && !store.isLoggedIn) {
-                dispatch({ type: 'login', payload: t });
-            }
-            if (!t && store.isLoggedIn) {
+            const token = localStorage.getItem("token");
+            if (token) {
+                dispatch({ type: 'login', payload: token });
+            } else {
                 dispatch({ type: 'logout' });
             }
         };
@@ -31,7 +29,7 @@ export const Login = () => {
             window.removeEventListener('storage', checkAuth);
             window.removeEventListener('authChange', checkAuth);
         };
-    }, [dispatch, store.isLoggedIn]);
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -65,13 +63,6 @@ export const Login = () => {
             setShowModal(false);
             navigate("/");
         }
-    }
-
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        dispatch({ type: 'logout' });
-        setShowModal(false);
-        navigate('/');
     }
 
     return (

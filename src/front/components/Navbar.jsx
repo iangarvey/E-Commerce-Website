@@ -36,6 +36,16 @@ export const Navbar = () => {
     if (store.isLoggedIn) fetchCartCount();
   }, [store.isLoggedIn]);
 
+  useEffect(() => {
+  if (store.showCartDropdown) {
+    const timer = setTimeout(() => {
+      dispatch({ type: 'close_cart_dropdown' });
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }
+}, [store.showCartDropdown, dispatch]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch({ type: 'logout' });

@@ -14,7 +14,7 @@ export const OrderSummary = ({ cartItems }) => {
             ))}
             
             <div className="total-container d-flex justify-content-center">
-                <h2>Total: ${total}</h2>
+                <h2>Total: ${total.toFixed(2)}</h2>
             </div>
             <div className="checkout-button-container d-flex justify-content-center">
                 <button className="btn btn-success">Checkout</button>

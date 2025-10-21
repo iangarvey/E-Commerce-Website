@@ -21,13 +21,24 @@ export const ProductCard = ({ item }) => {
         });
 
         if (response.ok) {
-            alert(`${title} has been removed from your cart!`);
-            // Notify navbar to update count
-            window.dispatchEvent(new Event("cartUpdate"));
-            // Refresh the cart page
+            const cartResponse = await fetch(`${apiUrl}api/cart`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (cartResponse.ok) {
+                const cartData = await cartResponse.json();
+                const totalQuantity = cartData.cart?.reduce((total, item) => {
+                    return total + item.quantity;
+                }, 0) || 0;
+
+                dispatch({ type: "update_cart_count", payload: totalQuantity });
+            }
+
             window.location.reload();
-        } else {
-            alert("Failed to remove item from cart. Please try again.");
         }
     };
 
