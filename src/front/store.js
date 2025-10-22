@@ -1,4 +1,6 @@
 export const initialStore = () => {
+  const token = localStorage.getItem("token");
+
   return {
     message: null,
     todos: [
@@ -14,9 +16,8 @@ export const initialStore = () => {
       },
     ],
     showCartDropdown: false,
-    // auth state
-    isLoggedIn: false,
-    token: null,
+    isLoggedIn: !!token, 
+    token: token || null, 
     cartCount: 0,
   };
 };
