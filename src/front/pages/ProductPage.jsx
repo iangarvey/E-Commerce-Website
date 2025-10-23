@@ -86,7 +86,9 @@ export const ProductPage = () => {
         <div className="description border border-warning">
           {product.description}
         </div>
-        <button className="btn btn-primary d-flex align-self-center mt-5" style={{ width: "18%" }} onClick={handleAddToCart}>Add to Cart</button>
+        <div className="button-container d-flex justify-content-center">
+          <button className="btn btn-primary text-center mt-5" style={{ width: "120px" }} onClick={handleAddToCart}>Add to Cart</button>
+        </div>
       </div>
     </div>
   );
