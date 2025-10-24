@@ -1,8 +1,13 @@
+
+
 export const OrderSummary = ({ cartItems }) => {
+
+
     // Add safety check for undefined cartItems
     const total = cartItems?.reduce((acc, item) => {
         return acc + (item.price * item.quantity);
     }, 0) || 0; // Default to 0 if cartItems is undefined
+
 
     return (
         <div className="order-summary-container border border-primary">
@@ -17,7 +22,7 @@ export const OrderSummary = ({ cartItems }) => {
                 <h2>Total: ${total.toFixed(2)}</h2>
             </div>
             <div className="checkout-button-container d-flex justify-content-center">
-                <button className="btn btn-success">Checkout</button>
+                <button className="btn btn border border-primary mb-1" style={{ color: "blue", backgroundColor: "lightblue"}}>Checkout</button>
             </div>
         </div>
     );
