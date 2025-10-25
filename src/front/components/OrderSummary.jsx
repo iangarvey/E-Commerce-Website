@@ -1,7 +1,6 @@
-
+import { Link } from "react-router-dom";
 
 export const OrderSummary = ({ cartItems }) => {
-
 
     // Add safety check for undefined cartItems
     const total = cartItems?.reduce((acc, item) => {
@@ -21,9 +20,9 @@ export const OrderSummary = ({ cartItems }) => {
             <div className="total-container d-flex justify-content-center">
                 <h2>Total: ${total.toFixed(2)}</h2>
             </div>
-            <div className="checkout-button-container d-flex justify-content-center">
+            <Link to="/checkout" className="checkout-button-container d-flex justify-content-center">
                 <button className="btn btn border border-primary mb-1" style={{ color: "blue", backgroundColor: "lightblue"}}>Checkout</button>
-            </div>
+            </Link>
         </div>
     );
 };

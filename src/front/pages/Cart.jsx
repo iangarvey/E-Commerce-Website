@@ -69,7 +69,7 @@ export const Cart = () => {
                     ))}
                 </div>
                 <div className="total-container" style={{ width: "35%" }}>
-                    <OrderSummary cartItems={cartItems}/>
+                    <OrderSummary cartItems={cartItems} />
                 </div>
             </div>
         </div>

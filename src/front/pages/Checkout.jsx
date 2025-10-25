@@ -1,6 +1,65 @@
-import { OrderSummary } from "../components/OrderSummary"
+import { useState, useEffect } from "react";
 
 export const Checkout = () => {
+
+    const [cartItems, setCartItems] = useState([]);
+    const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+
+    useEffect(() => {
+        const fetchCartItems = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Please log in to view your cart.");
+                return;
+            }
+
+            const response = await fetch(`${apiUrl}api/cart`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Cart items:", data.cart);
+                const cartItemsWithDetails = await Promise.all(
+                    data.cart.map(async (item) => {
+                        const productResponse = await fetch(`https://fakestoreapi.com/products/${item.product_id}`);
+
+                        if (productResponse.ok) {
+                            const productData = await productResponse.json();
+
+                            return {
+                                ...item,
+                                title: productData.title,
+                                price: productData.price,
+                                image: productData.image
+                            };
+                        } else {
+                            // Fallback if product fetch fails
+                            return {
+                                ...item,
+                                title: "Product",
+                                price: 0,
+                                image: "https://via.placeholder.com/150"
+                            };
+                        }
+                    })
+                );
+                setCartItems(cartItemsWithDetails);
+            } else {
+                alert("Failed to fetch cart items. Please try again.");
+            }
+        };
+        fetchCartItems();
+    }, []);
+
+    const total = cartItems?.reduce((acc, item) => {
+        return acc + (item.price * item.quantity);
+    }, 0) || 0; // Default to 0 if cartItems is undefined
+
     return (
         <div className="page-container" border border-primary style={{ paddingTop: "70px" }}>
             <div className="checkout-container">
@@ -80,10 +139,31 @@ export const Checkout = () => {
                         </form>
                     </div>
                 </div>
-                <div className="order-summary-container mt-3" style={{ width: "40%" }}>
-                    <OrderSummary />
+                <div className="order-summary-container border border-warning mt-3" style={{ width: "40%" }}>
+                    <h1>Order Summary</h1>
+                        {cartItems.map((item, index) => (
+                            <OrderSummaryCard key={index} item={item} />
+                        ))}
+                        <div className="total-container border-top mt-3 pt-3">
+                            <h4>Total: ${total.toFixed(2)}</h4>
+                        </div>
                 </div>
             </div>
         </div>
     )
 }
+
+const OrderSummaryCard = ({ item }) => {
+    const { title, price, quantity } = item;
+
+    const itemTotal = item.price * item.quantity || 0;
+
+    return (
+        <div className="order-summary-card-container border border-primary d-flex justify-content-center m-2">
+            <div className="title-and-price w-100 border border-primary">
+                <h5 className="title border border-danger m-1">{title}</h5>
+                <h5 className="price border border-danger m-1">${itemTotal} = ${price} x {quantity}</h5>
+            </div>
+        </div>
+    );
+};
