@@ -46,7 +46,13 @@ def create_user():
     try:
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": "User created successfully"}), 201
+        access_token = create_access_token(identity=str(new_user.id))
+        return jsonify({
+            "message": "User created successfully",
+            "token": access_token,
+            "user_id": str(new_user.id),
+            "email": new_user.email
+        }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500

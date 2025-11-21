@@ -1,11 +1,13 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
   const Navigate = useNavigate();
+  const { dispatch } = useGlobalReducer();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -20,9 +22,7 @@ export const SignUp = () => {
     };
 
     const response = await fetch(`${apiUrl}api/signup`, opts);
-
     const data = await response.json();
-    console.log("here's your data", data);
 
     if (!response.ok) {
       alert(data.error || "Sign Up failed");
@@ -31,12 +31,10 @@ export const SignUp = () => {
 
     if (data.token) {
       localStorage.setItem("token", data.token);
-
-      alert("Sign Up successful! You can now log in.");
-
-      window.location.href = "/login";
+      dispatch({ type: 'login', payload: data.token });
+      alert("Sign up successful! Happy shopping!");
+      Navigate("/");
     }
-    Navigate("/");
   };
 
   return (
