@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Checkout = () => {
-
     const [cartItems, setCartItems] = useState([]);
     const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+    const navigate = useNavigate();
+    const { dispatch } = useGlobalReducer();
 
     useEffect(() => {
         const fetchCartItems = async () => {
@@ -59,6 +62,29 @@ export const Checkout = () => {
     const total = cartItems?.reduce((acc, item) => {
         return acc + (item.price * item.quantity);
     }, 0) || 0; // Default to 0 if cartItems is undefined
+
+    const handleCheckoutSubmit = async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(`${apiUrl}api/checkout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({}) // No form data needed for demo
+        });
+
+        const data = await response.json();
+
+        // Clear cart count in navbar
+        dispatch({ type: 'update_cart_count', payload: 0 });
+
+        alert(`Order placed successfully! Your order number is #${data.order_id}`);
+        navigate("/"); // Go back to home page
+    };
 
     return (
         <div className="page-container" border border-primary style={{ paddingTop: "70px" }}>
@@ -134,19 +160,19 @@ export const Checkout = () => {
                                 <input type="CVV" className="form-control" id="CVV"></input>
                             </div>
                             <div className="button-container d-flex justify-content-center mb-3">
-                                <button type="submit" className="btn btn-primary">Submit</button>
+                                <button type="submit" className="btn btn-primary" onClick={handleCheckoutSubmit}>Submit</button>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div className="order-summary-container border border-warning mt-3" style={{ width: "40%" }}>
                     <h1>Order Summary</h1>
-                        {cartItems.map((item, index) => (
-                            <OrderSummaryCard key={index} item={item} />
-                        ))}
-                        <div className="total-container border-top mt-3 pt-3">
-                            <h4>Total: ${total.toFixed(2)}</h4>
-                        </div>
+                    {cartItems.map((item, index) => (
+                        <OrderSummaryCard key={index} item={item} />
+                    ))}
+                    <div className="total-container border-top mt-3 pt-3">
+                        <h4>Total: ${total.toFixed(2)}</h4>
+                    </div>
                 </div>
             </div>
         </div>

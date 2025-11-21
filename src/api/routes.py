@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Cart, CartItem, Product
+from api.models import db, User, Cart, CartItem, Product, Order
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, JWTManager
@@ -221,3 +221,96 @@ def remove_from_cart():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@api.route('/checkout', methods=['POST'])
+@jwt_required()
+def checkout():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    cart = Cart.query.filter_by(user_id=current_user_id).first()
+    
+    if not cart:
+        return jsonify({"error": "Cart not found"}), 404
+    
+    cart_id = cart.id
+    
+    data = request.get_json()
+    
+    cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
+    
+    # For demo purposes, use simple total calculation  
+    total = sum(item.quantity * 15.00 for item in cart_items)
+    
+    # Create order with demo data
+    new_order = Order(
+        user_id=current_user_id,
+        cart_id=cart_id,  
+        total=total,
+        phone_number="555-0123",  # Demo data
+        address="123 Demo Street",  # Demo data
+        city="Demo City",  # Demo data
+        state="Demo State",  # Demo data
+        zip_code="12345"  # Demo data
+    )
+    
+    try:
+        db.session.add(new_order)
+        
+        # Clear the cart after successful order creation
+        for item in cart_items:
+            db.session.delete(item)
+        
+        db.session.commit()
+        return jsonify({
+            "order_id": new_order.id,
+            "message": "Order placed successfully"
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/decrease-cart-item', methods=['PUT'])
+@jwt_required()
+def decrease_cart_item():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+
+    if not data or 'productId' not in data:
+        return jsonify({"error": "Product ID is required"}), 400
+
+    cart = Cart.query.filter_by(user_id=current_user_id).first()
+    if not cart:
+        return jsonify({"error": "Cart not found"}), 404
+
+    cart_item = CartItem.query.filter_by(
+        cart_id=cart.id,
+        product_id=data['productId']
+    ).first()
+
+    if not cart_item:
+        return jsonify({"error": "Item not found in cart"}), 404
+
+    try:
+        if cart_item.quantity > 1:
+            # Decrease quantity by 1
+            cart_item.quantity -= 1
+            db.session.commit()
+            return jsonify({"message": "Item quantity decreased", "new_quantity": cart_item.quantity}), 200
+        else:
+            # If quantity is 1, remove the item completely
+            db.session.delete(cart_item)
+            db.session.commit()
+            return jsonify({"message": "Item removed from cart"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+

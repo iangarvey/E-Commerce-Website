@@ -8,15 +8,13 @@ export const ProductCard = ({ item }) => {
 
     const handleRemoveFromCart = async () => {
         const token = localStorage.getItem("token");
-        console.log("Trying to remove product_id:", product_id);
-        console.log("Full item:", item);
         if (!token) {
             alert("Please log in to remove items from your cart.");
             return;
         }
 
-        const response = await fetch(`${apiUrl}api/remove-from-cart`, {
-            method: "DELETE",
+        const response = await fetch(`${apiUrl}api/decrease-cart-item`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
