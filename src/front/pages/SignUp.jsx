@@ -38,7 +38,7 @@ export const SignUp = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center mt-5">
+    <div className="min-vh-100 d-flex justify-content-center align-items-center">
       <div
         className="container m-5 border border-5"
         style={{ maxWidth: "500px" }}
