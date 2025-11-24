@@ -66,7 +66,7 @@ export const ProductPage = () => {
   }
 
   return (
-    <div className="container d-flex mt-5 p-0 border border-danger">
+    <div className="container d-flex p-0 border border-danger" style={{margin: "50px", marginTop: "120px"}}>
       <div
         className="product-image border border-success m-5 d-flex justify-content-center align-items-center"
         style={{ height: "500px", width: "40%", backgroundColor: "lightgrey" }}
