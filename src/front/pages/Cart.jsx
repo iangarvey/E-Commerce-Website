@@ -58,7 +58,7 @@ export const Cart = () => {
     }, []);
 
     return (
-        <div className="cart-page-container d-flex justify-content-center" style={{ marginTop: "100px" }}>
+        <div className="cart-page-container vh-100 mb-5 d-flex justify-content-center" style={{ marginTop: "100px" }}>
             <div className="cart-container border d-flex" style={{ minHeight: "400px", width: "80%" }}>
                 <div className="product-card-container" style={{ width: "65%" }}>
                     {cartItems.map((item) => (

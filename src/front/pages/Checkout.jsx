@@ -114,11 +114,11 @@ export const Checkout = () => {
                             </div>
                             <div className="mailing-address-container d-flex justify-content-around">
                                 <div className="m-3">
-                                    <label for="city" className="form-label">city</label>
+                                    <label for="city" className="form-label">City</label>
                                     <input type="city" className="form-control" id="city"></input>
                                 </div>
                                 <div className="m-3">
-                                    <label for="state" className="form-label">state</label>
+                                    <label for="state" className="form-label">State</label>
                                     <input type="state" className="form-control" id="state"></input>
                                 </div>
                                 <div className="m-3">
